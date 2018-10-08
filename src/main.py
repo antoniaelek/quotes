@@ -93,26 +93,25 @@ def normalize_for_filename(text):
         .replace("\\", "_").replace("/", "_").replace("\"", "_").replace("|", "_").replace("?", "_").replace("*", "_")
 
 
-def generate_images(quotes_list, quotes_font, quotes_colour, image_margin, image_fraction):
+def generate_image(quote_tuple, quotes_font, quotes_colour, image_margin, image_fraction):
     quote_background = (255 - quotes_colour[0], 255 - quotes_colour[1], 255 - quotes_colour[1], 64)
-    for q in quotes_list:
-        # get quote and author
-        quote, author = q
+    # get quote and author
+    quote, author = quote_tuple
 
-        # get wallpaper image
-        response = requests.get(url)
-        img = Image.open(BytesIO(response.content)).convert('RGBA')
+    # get wallpaper image
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content)).convert('RGBA')
 
-        # make a blank image for the text, initialized to transparent text color
-        txt_img = Image.new('RGBA', img.size, quote_background)
+    # make a blank image for the text, initialized to transparent text color
+    txt_img = Image.new('RGBA', img.size, quote_background)
 
-        # render text to blank image
-        render_quote_to_image(txt_img, quote, author, image_margin, image_fraction, quotes_font, quotes_colour)
+    # render text to blank image
+    render_quote_to_image(txt_img, quote, author, image_margin, image_fraction, quotes_font, quotes_colour)
 
-        # merge wallpaper with text
-        out = Image.alpha_composite(img, txt_img)
-        out.save(out_folder + normalize_for_filename(author) + "_" + normalize_for_filename(quote[:15]) + "_" +
-                 datetime.now().strftime("%Y%m%d-%H%M%S") + ".png")
+    # merge wallpaper with text
+    out = Image.alpha_composite(img, txt_img)
+    out.save(out_folder + normalize_for_filename(author) + "_" + normalize_for_filename(quote[:13]) + "_" +
+             datetime.now().strftime("%Y%m%d-%H%M%S") + ".png")
 
 
 if __name__ == '__main__':
@@ -121,9 +120,11 @@ if __name__ == '__main__':
     img_margin = 50
     img_fraction = 0.8
 
-    quotes = [(
-              "The easiest thing in the world is to convince yourself that you're right. As one grows old, it is easier still.",
-              "Robert Ludlum")]
-    generate_images(quotes, font, quote_colour,  img_margin, img_fraction)
+    quotes = [
+        ("The easiest thing in the world is to convince yourself that you're right. As one grows old, it is easier still.", "Robert Ludlum"),
+        ("We are all in the gutter, but some of us are looking at the stars.","Oscar Wilde"),
+        ("Failure is an option here. If things are not failing, you are not innovating enough.","Elon Musk")]
+    for quote in quotes:
+        generate_image(quote, font, quote_colour,  img_margin, img_fraction)
 
 
