@@ -10,7 +10,7 @@ url = "https://source.unsplash.com/featured/1600x900/?landscape"
 fonts_folder = "data/fonts/"
 font = fonts_folder + "Roboto-Regular.ttf"
 colour = (255, 255, 255, 255)
-img_margin = 50
+img_margin = 40
 img_fraction = 0.8
 
 
@@ -131,12 +131,13 @@ def _normalize_for_filename(text):
         .replace("\\", "_").replace("/", "_").replace("\"", "_").replace("|", "_").replace("?", "_").replace("*", "_")
 
 
-def generate_image(output_folder, quote, text_font=font, text_colour=colour,
+def generate_image(output_folder, quote, author, text_font=font, text_colour=colour,
                    image_margin=img_margin, image_fraction=img_fraction):
     """
     Generates image with given quote.
     :param output_folder: Output folder
-    :param quote: Tuple (<quote>, <author>)
+    :param quote: String
+    :param author: String
     :param text_font: Text font
     :param text_colour: Text colour
     :param image_margin: Image margin
@@ -144,8 +145,6 @@ def generate_image(output_folder, quote, text_font=font, text_colour=colour,
     :return: 
     """
     quote_background = (255 - text_colour[0], 255 - text_colour[1], 255 - text_colour[1], 64)
-    # get quote and author
-    quote, author = quote
 
     # get wallpaper image
     response = requests.get(url)
