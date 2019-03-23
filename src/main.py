@@ -13,4 +13,4 @@ if __name__ == '__main__':
 
     for quote in quotes:
         print(quote)
-        generate_image(out_folder, quote[1], quote[0])
+#        generate_image(out_folder, quote[1], quote[0])
