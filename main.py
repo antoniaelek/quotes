@@ -1,5 +1,5 @@
 from functions import generate_image
-from goodreads import get_quotes
+from goodreads.goodreads import get_quotes
 
 out_folder = "data/out/antonia/"
 
@@ -11,6 +11,7 @@ if __name__ == '__main__':
 
     print(len(quotes))
 
-    for quote in quotes:
-        print(quote)
-#        generate_image(out_folder, quote[1], quote[0])
+    for quote in quotes[:]:
+        if len(quote[1]) < 80:
+            print(quote)
+            generate_image(out_folder, quote[1], quote[0])

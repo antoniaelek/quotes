@@ -24,16 +24,27 @@ def _calculate_font_size(font_file, text, image, image_fraction):
     :return: font size that fits image
     """
     font_size = 1
-    text_font = ImageFont.truetype(font_file, 28)
+    text_font = ImageFont.truetype(font_file, 12)
 
-    # find font size that fits
+    # find font size that fits width
     while text_font.getsize(text)[0] < image_fraction * image.size[0]:
         # iterate until the text size is just larger than the criteria
         font_size += 1
         text_font = ImageFont.truetype(font_file, font_size)
 
     # de-increment to be sure it is less than criteria
-    return font_size - 1
+    font_size = font_size - 1
+
+    while text_font.getsize(text)[1] > 0.3 * image.size[1]:
+        # iterate until the text size is just larger than the criteria
+        font_size -= 1
+        text_font = ImageFont.truetype(font_file, font_size)
+
+    return font_size
+
+
+def _draw_text_plain(draw, text, x, y, text_font, text_colour):
+    draw.text((x, y), text, font=text_font, fill=text_colour)
 
 
 def _draw_text_with_shadow(draw, text, x, y, text_font, text_colour):
@@ -94,12 +105,15 @@ def _render_quote_to_image(image, quote_text, quote_author, image_margin, image_
     :param text_colour: Text colour
     """
     # Wrap quote
-    wrapped_quote = wrap(quote_text, width=image_margin)
+    wrap_width = len(quote_text)/4 if len(quote_text)/4 > image_margin else image_margin
+    wrapped_quote = wrap(quote_text, width=wrap_width)
 
     # Calculate font sizes
-    font_size = _calculate_font_size(text_font, wrapped_quote[0], image, image_fraction)
+    font_size = _calculate_font_size(text_font, max(wrapped_quote, key=len), image, image_fraction)
     font_normal = ImageFont.truetype(text_font, font_size)
-    font_small = ImageFont.truetype(text_font, int(font_size / 2))
+
+    font_small_size = int(font_size / 2) if int(font_size / 2) > 20 else 20
+    font_small = ImageFont.truetype(text_font, font_small_size)
 
     # Add quote to image
     draw = ImageDraw.Draw(image)
@@ -109,7 +123,7 @@ def _render_quote_to_image(image, quote_text, quote_author, image_margin, image_
     for line in wrapped_quote:
         w, h = draw.textsize(line, font=font_normal)
         x = (img_w - w) / 2
-        _draw_text_with_shadow(draw, line, x, y, font_normal, text_colour)
+        _draw_text_plain(draw, line, x, y, font_normal, text_colour)
         y += font_normal.getsize(line)[1]
 
     # Add author to image
@@ -117,7 +131,7 @@ def _render_quote_to_image(image, quote_text, quote_author, image_margin, image_
     x = (img_w - w) / 2
     draw.text((x, y), "", font=font_small, fill=text_colour)
     y += font_normal.getsize(quote_author)[1]
-    _draw_text_with_shadow(draw, quote_author, x, y, font_small, text_colour)
+    _draw_text_plain(draw, quote_author, x, y, font_small, text_colour)
 
 
 def _normalize_for_filename(text):
@@ -144,7 +158,7 @@ def generate_image(output_folder, quote, author, text_font=font, text_colour=col
     :param image_fraction: Fraction of image width to use for text
     :return: 
     """
-    quote_background = (255 - text_colour[0], 255 - text_colour[1], 255 - text_colour[1], 64)
+    quote_background = (255 - text_colour[0], 255 - text_colour[1], 255 - text_colour[1], 128)
 
     # get wallpaper image
     response = requests.get(url)
