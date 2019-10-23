@@ -1,7 +1,0 @@
-﻿certifi==2018.8.24
-chardet==3.0.4
-feedparser==5.2.1
-idna==2.7
-Pillow==5.3.0
-requests==2.21.0
-urllib3==1.24.2
